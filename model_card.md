@@ -132,8 +132,26 @@ Acousticness is loaded but never used in scoring. A user who values acoustic ins
 
 ## 9. Personal Reflection  
 
-Building this recommender revealed how easy it is to accidentally create biased systems. I started thinking genre match was the most important factor, so I weighted it highest. But in testing, I discovered that genre dominance actually *hides* what users really want—someone who loves high-energy classical music gets locked out by the genre matching rules.
+### Biggest Learning Moment
 
-The most surprising insight was Gym Hero appearing everywhere. It made me realize that without diversity checks, recommenders naturally converge toward "safe" choices (songs that are objectively appealing to anyone) rather than personalized picks. This is probably why Spotify's algorithm explicitly diversifies results—pure scoring breeds filter bubbles.
+Building this recommender revealed how easy it is to accidentally create biased systems **just by making design choices that seemed reasonable at the time.** I started thinking genre match was the most important factor, so I weighted it highest (10 points). But in testing, I discovered that genre dominance actually *hides* what users really want—someone who loves high-energy classical music gets locked out by the genre matching rules. This taught me that **fairness isn't baked into algorithms automatically; it requires testing against diverse user profiles.** The "edge case" of classical + high energy revealed a systemic bias that only appeared under stress testing. This is probably the most important lesson: your system will surprise you in ways that math alone can't predict.
 
-I also learned that explaining a recommendation is almost as important as the recommendation itself. When a song ranks high due to a feature mismatch (like high energy for a classical search), users need to know why so they can decide if it's worth investigating or if the system missed what they meant.
+### How AI Tools Helped (and Where I Double-Checked)
+
+Working through this project, I used Claude to help structure the evaluation methodology, generate synthetic test profiles, and analyze the surprising patterns in the data (like Gym Hero appearing in 3 of 5 top-5 lists). **Where I double-checked Claude:** When Claude suggested rebalancing weights as a fix, I tested it myself rather than accepting the recommendation at face value. The weight sensitivity experiment showed that rebalancing helped the edge case but left mainstream users unchanged—revealing that weight tuning wasn't the real solution. This taught me to use AI for *ideation and analysis* but *verify results empirically* before accepting recommendations, especially for claims about how a system will behave.
+
+### What Surprised Me About Simple Algorithms
+
+The biggest surprise was how **"human" the recommendations feel even though the algorithm is just weighted math.** Users naturally understand "+10 for genre match" and can reason about why Sunrise City ranks above Storm Runner for a pop lover. Yet this simplicity masks profound complexity: Gym Hero appearing everywhere despite serving different users taught me that **simple scoring naturally creates filter bubbles.** Without diversity enforcement, the algorithm converges toward "universally appealing" songs rather than personalized picks. This made me realize why production systems (Spotify, Apple Music) explicitly use diversity mechanisms—it's not just a nice-to-have feature, it's essential to prevent mathematical convergence toward safety.
+
+I was also surprised by how much the *explanation* matters. When a song ranks high due to a mismatch (e.g., high energy for a classical search), the breakdown helps users decide whether the system understood them or missed the mark. This taught me that recommendation systems are as much about **communicating reasoning** as about scoring accuracy.
+
+### What I'd Try Next
+
+If I extended this project, I'd focus on three things:
+
+1. **Reframe categories as continuous features:** Instead of "genre: classical OR pop" (binary match), treat genre as a point in musical space where distance matters. This would let the algorithm naturally discover users who bridge classical and electronic without explicit rules.
+
+2. **Add diversity enforcement:** Track which songs appear frequently across user profiles and penalize repetition. This would prevent Gym Hero from appearing everywhere while still ranking it high for profiles it genuinely fits.
+
+3. **Incorporate user feedback loops:** In a real system, I'd track what users actually listened to vs. what I recommended, then use that signal to adjust weights per-user. The "edge case" user might teach the system over time that high energy matters more to them than genre purity.
